@@ -99,7 +99,6 @@ class MultilingualBehavior extends ModelBehavior {
 		$Model->locale = $locale;
 		return $locale;
 	}
-
 		
 	/**
      * When a model row is deleted, this will delete locales for that Id
@@ -211,9 +210,17 @@ class MultilingualBehavior extends ModelBehavior {
      */
     public function afterSave(&$Model, $created) {
         if (!$Model->LocaleModel || $created) {
+			if ( !empty($Model->localeData) && $Model->LocaleModel && is_string($Model->locale) && $Model->locale != $this->settings[$Model->alias]['default']) {
+				$Model->localeData[$Model->primaryKey] = $Model->id;
+				$data = array($Model->alias => $Model->localeData);
+				$Model->LocaleModel->create($data);
+				$Model->LocaleModel->set('locale', $Model->locale);
+				$Model->LocaleModel->save();
+				unset($Model->localeData);
+			}
             return true;
         }
-        if (isset($Model->localeData) && !empty($Model->localeData)) {
+        if (!empty($Model->localeData)) {			
             $exist = $Model->LocaleModel->find('first', array('conditions'=>array(
                     'locale' => $Model->locale,
                     $Model->primaryKey => $Model->id
@@ -405,10 +412,11 @@ class MultilingualBehavior extends ModelBehavior {
 	            unset($Model->data[$Model->alias][$field]); 
 	        }
         }
-        if (!empty($Model->localeData)) {
+        if (!empty($Model->localeData) && isset($Model->data[$Model->alias][$Model->primaryKey])) {
              $Model->localeData[$Model->primaryKey] = 
                 $Model->data[$Model->alias][$Model->primaryKey];
         }
+
         return true;
     }
 	
@@ -451,4 +459,3 @@ class MultilingualBehavior extends ModelBehavior {
         return true;
     }
 }
-?>

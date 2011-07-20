@@ -580,7 +580,7 @@ class OrderedBehavior extends ModelBehavior {
 		//	Check if weight id is set. If not add to end, if set update all
 		// rows from ID and up
 		if (
-			!isset($Model->data[$Model->alias][$Model->primaryKey]) 
+			empty($Model->data[$Model->alias][$Model->primaryKey]) 
 				|| 
 			(
 				isset($Model->data[$Model->alias][$this->settings[$Model->alias]['field']]) 
@@ -667,7 +667,7 @@ class OrderedBehavior extends ModelBehavior {
 		$Model->id = null;
 		$last = $Model->find('first', $options);
 		$Model->id = $temp_model_id;
-		return $last;
+		return $last ? $last : 1;
 	}
 	
 	private function _newWeight($Model, $foreignKey = null) {
