@@ -11,7 +11,7 @@ class MenuHelperTest extends CakeTestCase {
 	function setup() {
 		$this->Menu = new MenuHelper();
 		$this->Menu->Html = new HtmlHelper();
-		$view =& new View(new TheMenuTestController());
+		$view = new View(new TheMenuTestController());
 		ClassRegistry::addObject('view', $view);
 	}
 
